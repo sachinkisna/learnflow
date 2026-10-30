@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  password      String
+  name          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  settings      UserSettings?
+  sessions      Session[]
+}
+
+model UserSettings {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, name])
+}
+
+model LearningPath {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  category      String?
+  status        String    @default("PLANNED")
+  priority      String    @default("MEDIUM")
+  startDate     DateTime?
+  targetDate    DateTime?
+  userId        String
+  chapters      LearningChapter[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model LearningChapter {
+  id            String    @id @default(cuid())
+  title         String
+  pathId        String
+  path          LearningPath @relation(fields: [pathId], references: [id])
+  steps         LearningStep[]
+  order         Int
+}
+
+model LearningStep {
+  id            String    @id @default(cuid())
+  title         String
+  chapterId     String
+  chapter       LearningChapter @relation(fields: [chapterId], references: [id])
+  status        String    @default("NOT_STARTED")
+  order         Int
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  type        String
+  userId      String
+  createdAt   DateTime @default(now())
+}
+
+model Task {
+  id            String   @id @default(cuid())
+  title         String
+  status        String   @default("TODO")
+  scheduledDate DateTime?
+  userId        String
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("PLANNED")
+  repoUrl     String?
+  demoUrl     String?
+  userId      String
+  createdAt   DateTime @default(now())
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  size      Int
+  userId    String
+  createdAt DateTime @default(now())
+}
