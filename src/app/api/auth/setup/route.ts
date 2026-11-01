@@ -35,28 +35,30 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: name || "Admin",
-        settings: {
-          create: {
-            timezone: "UTC",
+    const user = await prisma.$transaction(async (transaction) => {
+      const createdUser = await transaction.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name: name || "Admin",
+          settings: {
+            create: {
+              timezone: "UTC",
+            },
           },
         },
-      },
-    });
-
-    for (const cat of DEFAULT_CATEGORIES) {
-      await prisma.category.create({
-        data: {
-          name: cat.name,
-          color: cat.color,
-          userId: user.id,
-        },
       });
-    }
+
+      await transaction.category.createMany({
+        data: DEFAULT_CATEGORIES.map((category) => ({
+          name: category.name,
+          color: category.color,
+          userId: createdUser.id,
+        })),
+      });
+
+      return createdUser;
+    });
 
     return NextResponse.json({
       message: "First admin user created successfully",

@@ -3,10 +3,9 @@
 ## Database Setup
 
 - **Technology**: MySQL with Prisma ORM
-- **Database File**: Not created - host database to be configured by user
-- **Alternative**: SQLite for development
-- **Decision**: Use MySQL for production as per requirements; SQLite for local development
-- **Rationale**: MySQL is specified for production to meet hosting requirements while SQLite simplifies local development
+- **Connection**: `DATABASE_URL` in every environment
+- **Decision**: Use MySQL in production and development to keep Prisma migrations consistent
+- **Rationale**: Hostinger provides MySQL, and a single provider avoids deploying a SQLite-only schema to production
 
 ## Authentication
 
@@ -29,7 +28,7 @@
 
 ## Build Process
 
-- **Framework**: Next.js App Router (v15.0.0)
+- **Framework**: Next.js App Router (v15.5.28)
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **TypeScript**: Strict mode enabled
 - **Rationale**: Modern, type-safe development stack as specified in requirements

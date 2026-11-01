@@ -2,9 +2,9 @@
 
 ## Prerequisites
 
-- Hostinger Node.js hosting with MySQL
-- Next.js App Router support (v15.0.0+)
-- MySQL database with appropriate privileges
+- Hostinger Node.js hosting with a MySQL database
+- Next.js App Router support (v15.5.28)
+- MySQL database credentials configured as `DATABASE_URL`
 
 ## Environment Variables
 
@@ -20,7 +20,14 @@ MAX_FILE_SIZE=10485760
 ALLOWED_FILE_TYPES=pdf,txt,md,docx,xlsx,png,jpg,jpeg,webp,zip"
 ```
 
+`DATABASE_URL` must be the MySQL connection string for the Hostinger
+database, in the form `mysql://USER:PASSWORD@HOST:3306/DATABASE`.
+
 ## Build and Deploy
+
+Set `DATABASE_URL` to the MySQL connection string from Hostinger. The
+production `npm start` command applies committed Prisma migrations before
+starting Next.js. Do not run `prisma migrate dev` against production.
 
 ### 1. Local Development (Optional)
 
@@ -56,23 +63,14 @@ npm run start
 
 ## Database Migration
 
-### Initial Setup
+Create and review migrations locally, then commit them:
 
 ```bash
-npx prisma init
+npx prisma migrate dev --name describe-change
 ```
 
-Edit generated `schema.prisma` according to project requirements, then:
-
-```bash
-npx prisma migrate dev
-```
-
-### Production Migration
-
-```bash
-npx prisma migrate deploy
-```
+On deployment, `npm start` applies committed migrations with
+`prisma migrate deploy` before launching the app.
 
 ## File Uploads
 
